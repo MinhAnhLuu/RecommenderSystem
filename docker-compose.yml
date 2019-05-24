@@ -1,0 +1,297 @@
+version: "3.3"
+
+networks:
+    frontend:
+        ipam:
+            config:
+                - subnet: 172.20.0.0/24
+
+services:
+    rabbit:
+        container_name: restaurant-rabbitmq
+        image: rabbitmq:3.6-management-alpine
+        # deploy:
+        #     replicas: 1
+        #     resources:
+        #         limits:
+        #             cpus: "0.2"
+        #             memory: 500M
+        #     restart_policy:
+        #         condition: on-failure
+        restart: on-failure
+        hostname: rabbit
+        ports:
+            - "15672:15672" # Exposing RabbitMQ web management on different port for convenience
+            - "5672:5672"
+        volumes:
+            - "./config/rabbitmq.config:/etc/rabbitmq/rabbitmq.config"
+            - "data:/var/lib/rabbitmq"
+        networks:
+            frontend:
+                ipv4_address: 172.20.0.12
+
+    postgres:
+        container_name: restaurant-postgres
+        image: postgres:10.5-alpine
+        # deploy:
+        #     replicas: 3
+        #     resources:
+        #         limits:
+        #             cpus: "0.4"
+        #             memory: 500M
+        #     restart_policy:
+        #         condition: on-failure
+        restart: on-failure
+        ports:
+            - "5433:5432" # Exposing Postgres on different port for convenience
+        environment:
+            POSTGRES_DB: "orders"
+            POSTGRES_PASSWORD: "password"
+            POSTGRES_USER: "postgres"
+            POSTGRES_HOST: "postgres"
+            POSTGRES_PORT: "5433"
+            PGDATA: "/var/lib/postgresql/data"
+        volumes:
+            - "data:/var/lib/postgresql"
+            - "./scripts/postgres/1-createOrderTables.sql:/docker-entrypoint-initdb.d/1-createOrderTables.sql"
+        networks:
+            frontend:
+                ipv4_address: 172.20.0.2
+
+    redis:
+        container_name: restaurant-redis
+        image: redis:4.0.11-alpine
+        # deploy:
+        #     replicas: 1
+        #     resources:
+        #         limits:
+        #             cpus: "0.1"
+        #             memory: 500M
+        #     restart_policy:
+        #         condition: on-failure
+        restart: on-failure
+        ports:
+            - "6380:6379" # Exposing Redis on different port for convenience
+        volumes:
+            - "./config/redis.conf:/usr/local/etc/redis/redis.conf"
+            - "data:/data"
+        networks:
+            frontend:
+                ipv4_address: 172.20.0.3
+
+#    authentication:
+#        container_name: restaurant-authentication
+#        image: restaurant-authentication:dev_chau
+#        # deploy:
+#        #     replicas: 1
+#        #     resources:
+#        #         limits:
+#        #             cpus: "0.1"
+#        #             memory: 50M
+#        #     restart_policy:
+#        #         condition: on-failure
+#        restart: on-failure
+#        depends_on:
+#            - postgres
+#        environment:
+#            DB_PASSWORD: "password"
+#            DB_USER: "postgres"
+#            DB_HOST: "postgres"
+#            DB_NAME: "orders"
+#        links:
+#            - "postgres:restaurant-postgres"
+#        ports:
+#            - "8004:8000"
+#        volumes:
+#            - "log:/application/log"
+#            - "source:/home/docker/authentication"
+#        networks:
+#            frontend:
+#                ipv4_address: 172.20.0.4
+
+    nginx:
+        container_name: restaurant-nginx
+        image: restaurant-nginx:dev_nginx
+        # deploy:
+        #     replicas: 1
+        #     resources:
+        #         limits:
+        #             cpus: "0.1"
+        #             memory: 50M
+        #     restart_policy:
+        #         condition: on-failure
+        restart: on-failure
+        environment:
+            NGINX_HOST: "nginx"
+            NGINX_PORT: "8080"
+        ports:
+            - "8080:80"
+        volumes:
+            - "log:/var/log/nginx"
+            - "./authentication:/home/docker/authentication"
+        networks:
+            frontend:
+                ipv4_address: 172.20.0.5
+
+    orders:
+        container_name: restaurant-orders
+        image: restaurant-orders:dev_chau
+        # deploy:
+        #     replicas: 2
+        #     resources:
+        #         limits:
+        #             cpus: "0.1"
+        #             memory: 50M
+        #     restart_policy:
+        #         condition: on-failure
+        restart: on-failure
+        depends_on:
+           - rabbit
+           - postgres
+        ports:
+            - "8001:8000"
+        links:
+            - "rabbit:restaurant-rabbitmq"
+            - "postgres:restaurant-postgres"
+        environment:
+            DB_PASSWORD: "password"
+            DB_USER: "postgres"
+            DB_HOST: "postgres"
+            DB_NAME: "orders"
+            RABBIT_PASSWORD: "guest"
+            RABBIT_USER: "guest"
+            RABBIT_HOST: "rabbit"
+            RABBIT_PORT: "5672"
+            RABBIT_MANAGEMENT_PORT: "15672"
+        volumes:
+            - "log:/application/log/"
+            - "/home/minhanhluu/gnt/RecommendationSystem/backend/python/orders:/home/docker/orders"
+        networks:
+            frontend:
+                ipv4_address: 172.20.0.6
+
+    products:
+        container_name: restaurant-products
+        image: restaurant-products:dev_chau
+        # deploy:
+        #     replicas: 1
+        #     resources:
+        #         limits:
+        #             cpus: "0.1"
+        #             memory: 50M
+        #     restart_policy:
+        #         condition: on-failure
+        restart: on-failure
+        depends_on:
+            - rabbit
+            - redis
+        ports:
+            - "8002:8000"
+        links:
+            - "rabbit:restaurant-rabbitmq"
+            - "redis:restaurant-redis"
+        environment:
+            REDIS_HOST: "redis"
+            REDIS_PORT: "6379"
+            REDIS_INDEX: "11"
+            RABBIT_PASSWORD: "guest"
+            RABBIT_USER: "guest"
+            RABBIT_HOST: "rabbit"
+            RABBIT_PORT: "5672"
+            RABBIT_MANAGEMENT_PORT: "15672"
+        volumes:
+            - "log:/application/log/"
+            - "/home/minhanhluu/gnt/RecommendationSystem/backend/python/products:/home/docker/products"
+        networks:
+            frontend:
+                ipv4_address: 172.20.0.7
+
+    gateway:
+        container_name: restaurant-gateway
+        image: restaurant-gateway:dev_chau
+        # deploy:
+        #     replicas: 3
+        #     resources:
+        #         limits:
+        #             cpus: "0.1"
+        #             memory: 50M
+        #     restart_policy:
+        #         condition: on-failure
+        restart: on-failure
+        depends_on:
+            - rabbit
+        ports:
+            - "8003:8000"
+        links:
+            - "rabbit:restaurant-rabbitmq"
+        environment:
+            GATEWAY_HOST: "gateway"
+            GATEWAY_PORT: "8003"
+            RABBIT_PASSWORD: "guest"
+            RABBIT_USER: "guest"
+            RABBIT_HOST: "rabbit"
+            RABBIT_PORT: "5672"
+            RABBIT_MANAGEMENT_PORT: "15672"
+        volumes:
+            - "log:/application/log/"
+            - "/home/minhanhluu/gnt/RecommendationSystem/backend/python/gateway:/home/docker/gateway"
+        networks:
+            frontend:
+                ipv4_address: 172.20.0.8
+
+    recommender:
+        container_name: restaurant-recommender
+        image: restaurant-recommender:dev_chau
+        restart: on-failure
+        environment:
+            ELASTICSEARCH_HOST: "elasticsearch"
+            ELASTICSEARCH_PORT: "9200"
+            RABBIT_PASSWORD: "guest"
+            RABBIT_USER: "guest"
+            RABBIT_HOST: "rabbit"
+            RABBIT_PORT: "5672"
+            RABBIT_MANAGEMENT_PORT: "15672"
+        depends_on:
+            - elasticsearch
+        ports:
+            - "8005:8000"
+        volumes:
+            - "/home/minhanhluu/gnt/RecommendationSystem/backend/python/recommender:/home/docker/recommender"
+        networks:
+            frontend:
+                ipv4_address: 172.20.0.9
+    
+    web:
+        container_name: restaurant-web
+        image: restaurant-web:dev_chau
+        restart: on-failure
+        ports:
+            - "3000:3000"
+        volumes:
+            - "/home/minhanhluu/gnt/RecommendationSystem/backend/python/web:/home/node/web"
+        environment:
+            GATEWAY_HOST: "172.20.0.8"
+        networks:
+            frontend:
+                ipv4_address: 172.20.0.10
+    
+    elasticsearch:
+        container_name: restaurant-elasticsearch
+        image: elasticsearch:5.6.12-alpine
+        restart: on-failure
+        environment:
+            ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+        ports:
+            - "9200:9200"
+            - "9300:9300"
+        volumes:
+            - "es-data:/usr/share/elasticsearch/data"
+        networks:
+            frontend:
+                ipv4_address: 172.20.0.11
+        
+
+volumes:
+    log:
+    data:
+    es-data:

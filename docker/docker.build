@@ -1,0 +1,27 @@
+FROM restaurant-base
+MAINTAINER R_D_Team
+
+USER root
+
+RUN apk add --no-cache \
+    gcc \
+    musl-dev \
+    postgresql-dev \
+    linux-headers && \
+    python3 -m ensurepip --upgrade && \
+    if [[ ! -e /usr/bin/python ]]; then ln -sf /usr/bin/python3 /usr/bin/python; fi && \
+	pip install wheel && \
+	mkdir -p /home/docker/wheelhouse && \
+	chown -R docker:docker /home/docker
+
+USER docker
+WORKDIR /home/docker
+
+ENV WHEELHOUSE=/home/docker/wheelhouse
+ENV PIP_WHEEL_DIR=/home/docker/wheelhouse
+ENV PIP_FIND_LINKS=/home/docker/wheelhouse
+
+VOLUME ["/home/docker/wheelhouse"]
+
+CMD ["pipenv", "run", "pip", "wheel", "."]
+

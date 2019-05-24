@@ -1,0 +1,84 @@
+#------------------489Mb-----------------
+FROM publysher/alpine-machine-learning
+MAINTAINER R_D_Team
+
+ARG UID=1000
+ARG GID=1000
+
+RUN apk add --no-cache curl netcat-openbsd && \
+    python3 -m ensurepip --upgrade && \
+    if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi && \
+    if [[ ! -e /usr/bin/python ]]; then ln -sf /usr/bin/python3 /usr/bin/python; fi && \
+    pip install -U pip && \
+    set -x && \
+    addgroup -S docker -g $GID && \
+    adduser -S docker -G docker -u $UID && \
+    rm -r /root/.cache
+
+USER docker
+ENV PYTHONPATH=/home/docker
+ENV LANG en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
+
+#COPY . /home/docker/recommender/
+COPY ./run.sh /home/docker/recommender/run.sh
+COPY ./wheelhouse /home/docker/recommender/wheelhouse
+WORKDIR /home/docker/recommender
+
+USER root
+
+RUN chmod +x /home/docker/recommender/run.sh \
+	&& chown -R docker:docker /home/docker
+
+RUN pip install --no-index -f /home/docker/recommender/wheelhouse restaurant-recommender \
+    && rm -rf wheelhouse/
+
+USER docker
+
+CMD sh run.sh
+
+
+
+
+# ----------------346mb-------------------------
+#FROM publysher/alpine-scipy:1.0.0-numpy1.14.0-python3.6-alpine3.7
+
+#RUN apk --no-cache add --virtual .builddeps g++ musl-dev && pip install scikit-learn==0.19.1 && apk del .builddeps && rm -rf /root/.cache
+
+# ----------------492mb-------------------------
+#FROM python:3.5-alpine
+
+#RUN apk add --no-cache --update -X glibc curl gcc g++ && \
+#    ln -s /usr/include/locale.h /usr/include/xlocale.h
+
+#RUN pip install numpy pandas
+
+#CMD tail -f /dev/null
+# -----------------------------------------
+#FROM python:3.6-slim-jessie
+
+#USER root
+
+#COPY . /home/docker/recommender/
+
+#WORKDIR /home/docker/recommender
+
+#ARG SKLEARN_VERSION=0.20.2
+#ARG PANDAS_VERSION=0.23.4
+#ARG NUMPY_VERSION=1.14.3
+
+#RUN apk add --no-cache python3-dev libstdc++ curl py-numpy && \
+#    apk add --no-cache --virtual .build-deps g++ && \
+#    pip install pandas==${PANDAS_VERSION} && \
+#    pip install scikit-learn==${SKLEARN_VERSION} && \
+#    apk del .build-deps
+
+#RUN chmod +x /home/docker/recommender/run.sh \
+	#&& chown -R docker:docker /home/docker
+
+#USER docker
+
+#RUN pipenv run  pip install --no-index -f /home/docker/recommender/wheelhouse restaurant-recommender \
+ #   && rm -rf wheelhouse/
+
+#CMD pipenv run sh run.sh

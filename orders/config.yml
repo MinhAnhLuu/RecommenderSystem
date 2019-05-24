@@ -1,0 +1,7 @@
+DB_URIS: 
+    "orders:Base": postgresql://postgres:5432/orders
+# "orders:Base": postgresql://${DB_USER:postgres}:${DB_PASSWORD:password}@${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:orders}
+
+
+# AMQP_URI: amqp://${RABBIT_USER:guest}:${RABBIT_PASSWORD:guest}@${RABBIT_HOST:rabbit}:${RABBIT_PORT:5672}/
+AMQP_URI: amqp://rabbit:5672/

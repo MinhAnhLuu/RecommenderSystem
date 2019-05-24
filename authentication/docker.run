@@ -1,0 +1,23 @@
+FROM restaurant-base
+
+#COPY . /home/docker/authentication
+COPY ./run.sh /home/docker/authentication/run.sh
+COPY ./manage.py /home/docker/authentication/manage.py
+COPY ./wheelhouse /home/docker/authentication/wheelhouse
+
+USER root
+
+RUN chmod +x /home/docker/authentication/run.sh  && \
+    chmod +x /home/docker/authentication/manage.py \
+    && chown -R docker:docker /home/docker
+
+WORKDIR /home/docker/authentication
+
+RUN apk add --no-cache postgresql-client
+
+USER docker
+
+RUN pipenv run pip install --no-index -f /home/docker/authentication/wheelhouse restaurant-authentication \
+    && rm -rf wheelhouse/
+
+CMD pipenv run sh run.sh

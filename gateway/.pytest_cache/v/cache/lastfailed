@@ -1,0 +1,15 @@
+{
+  "test/interface/test_service.py::TestCreateProduct::()::test_can_create_product": true,
+  "test/interface/test_service.py::TestCreateProduct::()::test_create_product_fails_with_invalid_data": true,
+  "test/interface/test_service.py::TestCreateProduct::()::test_create_product_fails_with_invalid_json": true,
+  "test/interface/test_service.py::TestCreateProduct::test_can_create_product": true,
+  "test/interface/test_service.py::TestCreateProduct::test_create_product_fails_with_invalid_data": true,
+  "test/interface/test_service.py::TestCreateProduct::test_create_product_fails_with_invalid_json": true,
+  "test/interface/test_service.py::TestGetOrder::()::test_can_get_order": true,
+  "test/interface/test_service.py::TestGetOrder::test_can_get_order": true,
+  "test/interface/test_service.py::TestGetProduct::()::test_can_get_all_products": true,
+  "test/interface/test_service.py::TestGetProduct::()::test_can_get_product": true,
+  "test/interface/test_service.py::TestGetProduct::()::test_product_not_found": true,
+  "test/interface/test_service.py::TestGetProduct::test_can_get_product_list": true,
+  "test/unit/test_entrypoints.py::TestHttpEntrypoint::()": true
+}

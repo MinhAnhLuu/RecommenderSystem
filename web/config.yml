@@ -1,0 +1,2 @@
+# AMQP_URI: amqp://${RABBIT_USER:guest}:${RABBIT_PASSWORD:guest}@${RABBIT_HOST:rabbit}:${RABBIT_PORT:5672}/
+AMQP_URI: amqp://rabbit:5672/

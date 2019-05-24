@@ -1,0 +1,22 @@
+FROM node:8-alpine
+MAINTAINER R_D_Team
+
+ARG USER=node
+ARG GROUP=node
+
+RUN apk add --no-cache curl
+
+USER $USER
+
+COPY ./run.sh /home/node/web/run.sh
+
+WORKDIR /home/node/web
+
+USER root
+
+RUN chmod +x /home/node/web/run.sh \
+	&& chown -R $USER:$GROUP /home/node
+
+USER $USER
+
+CMD sh run.sh

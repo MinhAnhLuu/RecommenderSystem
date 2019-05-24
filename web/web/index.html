@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang = "en">
+   <head>
+      <meta charset = "UTF-8">
+      <title>Recommender System</title>
+
+      <link href="http://fonts.googleapis.com/css?family=Open+Sans:400" rel="stylesheet">
+      <link href="assets/css/styles.css" rel="stylesheet">
+      <link rel="stylesheet" href="node_modules/easy-autocomplete/dist/easy-autocomplete.min.css">
+      <link rel="stylesheet" href="node_modules/easy-autocomplete/dist/easy-autocomplete.themes.min.css">
+      
+   </head>
+   <body>
+
+      <header class="compact">
+         <h2 class="tzine"><a href="http://127.0.0.1:3000">Back to our website</a></h2>
+         <h1><a href="#">Recommender System in E-commerce</a></h1>
+      </header>
+
+      <div class="main-content">
+         <div id="searchbar" class="searchbar"></div>
+         
+         <div class="all-products">
+            <div class="filters">
+               <form id="model">
+                  <div class="filter-criteria">
+                     <span>Model Suggestion</span>
+
+                     <div class="tooltip">
+                        <label><input type="radio" name="model" value="user" checked>Rating</label>
+                        <span class="tooltiptext">This model suggest for you top highest rating items, which are highly appreciated by other users.</span>
+                      </div>
+
+                      <div class="tooltip">
+                        <label><input type="radio" name="model" value="content">Description</label>
+                        <span class="tooltiptext">Items which are suggested in this list have a close relation with another based on their descriptions.</span>
+                     </div>
+
+                     <div class="tooltip">
+                        <label><input type="radio" name="model" value="keyword">Genres & Actors</label>
+                        <span class="tooltiptext">This model recommends related items based on their keywords, such as: Directors, Actors, Genres, Keywords, etc.</span>
+                     </div>
+                  </div>
+                  <button>Clear filters</button>
+               </form>
+            </div>
+
+            <div class="products-list">
+                  <script id="products-template" type="text/html">​
+                        {{#each this}}
+                           <li data-index="{{id}}">
+                              <a href="#" class="product-photo"><img src="{{image}}" height="130" alt="{{name}}"/></a>
+                              <h2><a href="#"> {{title}} </a></h2>
+                              <ul class="product-description">
+                                 <li><span>Overview: </span>{{overview_short}}</li>
+                                 <li><span>Rating: </span>{{vote_average}}</li><br>
+                                 <li><span>Genre: </span>{{genres}}</li><br>
+                                 <li><span>Relative Score: </span>{{score}}%</li>
+                              </ul>
+                              <button>Watch Now!</button>
+                              <div class="highlight"></div>
+                           </li>
+                        {{/each}}
+                  </script>
+            </div>
+         </div>
+
+         <div class="single-product page">
+               <div class="overlay"></div>
+
+               <div class="preview-large">
+                   <h3>Single product view</h3>
+                   <img src=""/>
+                   <h2>Overview</h2>
+                   <p></p>
+       
+                   <span class="close">&times;</span>
+               </div>
+         </div>
+
+         <div class="error page">
+            <div class="overlay"></div>
+
+            <div class="preview-large">
+               <h1>Sorry, Item not found :((</h1>
+               <img src="https://cdn.dribbble.com/users/721524/screenshots/4117132/untitled-1-_1_.png"/>
+               <span class="close">&times;</span>
+            </div>
+         </div>
+      </div>
+
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	   <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
+      <script src="src/Components/Searchbar.js"></script>
+      <script src="node_modules/easy-autocomplete/dist/jquery.easy-autocomplete.js"></script>
+      <link rel="stylesheet" href="node_modules/easy-autocomplete/dist/easy-autocomplete.themes.min.css"> 
+   </body>
+</html>

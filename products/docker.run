@@ -1,0 +1,19 @@
+FROM restaurant-base
+
+USER root
+
+#COPY . /home/docker/products/
+COPY ./run.sh /home/docker/products/run.sh
+COPY ./wheelhouse /home/docker/products/wheelhouse
+
+WORKDIR /home/docker/products
+
+RUN chmod +x /home/docker/products/run.sh \
+    && chown -R docker:docker /home/docker
+
+USER docker
+
+RUN pipenv run pip install --no-index -f /home/docker/products/wheelhouse restaurant-products \
+    && rm -rf wheelhouse/
+
+CMD pipenv run sh run.sh;

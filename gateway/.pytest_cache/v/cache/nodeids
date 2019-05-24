@@ -1,0 +1,7 @@
+[
+  "test/interface/test_service.py::TestGetProduct::test_can_get_product_list",
+  "test/interface/test_service.py::TestCreateProduct::test_can_create_product",
+  "test/interface/test_service.py::TestCreateProduct::test_create_product_fails_with_invalid_json",
+  "test/interface/test_service.py::TestCreateProduct::test_create_product_fails_with_invalid_data",
+  "test/interface/test_service.py::TestGetOrder::test_can_get_order"
+]
