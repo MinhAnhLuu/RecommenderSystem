@@ -1,1 +1,12 @@
-//recommender/processed_data/*
+**/gateway/wheelhouse/
+**/orders/wheelhouse/
+**/products/wheelhouse/
+**/authentication/wheelhouse/
+**/recommender/processed_data/
+**/recommender/wheelhouse/
+**/data/
+**/.python-version
+**/.coverage
+**/.coveragerc
+**/orders.sql
+**/.idea/*
