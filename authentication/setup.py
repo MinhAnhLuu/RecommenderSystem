@@ -9,7 +9,7 @@ setup(
     packages=find_packages(exclude=['test', 'test.*']),
     py_modules=['authentication'],
     install_requires=[
-        "Django==2.0.4",
+        "Django==2.2.24",
         "configparser==3.5.0",
         'hashids==1.2.0',
         'psycopg2==2.7.4',
