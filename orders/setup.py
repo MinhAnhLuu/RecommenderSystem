@@ -10,7 +10,7 @@ setup(
     py_modules=['orders'],
     install_requires=[
         'SQLAlchemy==1.2.6',
-        'nameko==2.8.3',
+        'nameko==2.14.0',
         'nameko-sqlalchemy==1.1.0',
         #'alembic==1.0.2',
         'marshmallow==2.15.0',
