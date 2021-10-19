@@ -10,7 +10,7 @@ setup(
     py_modules=['recommender'],
     install_requires=[
         'SQLAlchemy==1.2.6',
-        'nameko==2.8.3',
+        'nameko==2.14.0',
         'nameko-sqlalchemy==1.1.0',
         'elasticsearch>=5.0.0,<6.0.0',
         # 'pandas==0.23.4',
