@@ -10,7 +10,7 @@ setup(
     py_modules=['gateway'],
     install_requires=[
         'marshmallow==2.15.0',
-        'nameko==2.8.3',
+        'nameko==2.14.0',
         'Flask-API',
         'configparser==3.5.0',
         'hashids==1.2.0',
